@@ -20,5 +20,7 @@ func InitRouter() *gin.Engine {
 
 	r.Use(middleware.GlobalErrorHandler())
 
+	Auth(r.Group("/auth/"))
+
 	return r
 }
