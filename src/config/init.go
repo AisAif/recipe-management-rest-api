@@ -15,7 +15,11 @@ func Init() error {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		return err
+		viper.SetConfigFile("../.env")
+		viper.AutomaticEnv()
+		if err = viper.ReadInConfig(); err != nil {
+			return err
+		}
 	}
 
 	viper.SetDefault("port", getEnv("APP_PORT", "4000"))
