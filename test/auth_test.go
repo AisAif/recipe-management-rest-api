@@ -86,12 +86,7 @@ var _ = Describe("Auth", func() {
 		})
 
 		It("should return 400: username is exist", func() {
-			models.DB.Create(&models.User{
-				Username: "test",
-				Name:     "test",
-				Password: "testtest",
-			})
-
+			CreateUser()
 			exampleUser := models.User{
 				Username: "test",
 				Name:     "test",
@@ -106,6 +101,79 @@ var _ = Describe("Auth", func() {
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
 			Expect(w.Body.String()).To(ContainSubstring(`exist`))
+		})
+	})
+
+	Context("Login", func() {
+
+		BeforeEach(func() {
+			RemoveAllData()
+			CreateUser()
+		})
+
+		It("should return 200", func() {
+			exampleUser := models.User{
+				Username: "test",
+				Password: "testtest",
+			}
+			userJson, _ := json.Marshal(exampleUser)
+
+			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
+			req.Header.Set("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			log.Info().Msg(w.Body.String())
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(w.Body.String()).To(ContainSubstring(`token`))
+		})
+
+		It("should return 400: all fields are required", func() {
+			exampleUser := models.User{
+				Username: "",
+				Password: "",
+			}
+			userJson, _ := json.Marshal(exampleUser)
+
+			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
+			req.Header.Set("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			log.Info().Msg(w.Body.String())
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
+			Expect(w.Body.String()).To(ContainSubstring(`username`))
+			Expect(w.Body.String()).To(ContainSubstring(`password`))
+		})
+
+		It("should return 404: user not found ", func() {
+			exampleUser := models.User{
+				Username: "testt",
+				Password: "testtest",
+			}
+			userJson, _ := json.Marshal(exampleUser)
+
+			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
+			req.Header.Set("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			log.Info().Msg(w.Body.String())
+			Expect(w.Code).To(Equal(http.StatusNotFound))
+			Expect(w.Body.String()).To(ContainSubstring(`not found`))
+		})
+
+		It("should return 400: password is wrong", func() {
+			exampleUser := models.User{
+				Username: "test",
+				Password: "testtests",
+			}
+			userJson, _ := json.Marshal(exampleUser)
+
+			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
+			req.Header.Set("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			log.Info().Msg(w.Body.String())
+			Expect(w.Code).To(Equal(http.StatusBadRequest))
+			Expect(w.Body.String()).To(ContainSubstring(`Invalid username`))
 		})
 	})
 })
