@@ -24,7 +24,7 @@ func GlobalErrorHandler() gin.HandlerFunc {
 					for i, fe := range ve {
 						out[i] = utils.ValidationError{
 							Field:   strcase.ToSnake(fe.Field()),
-							Message: utils.MessageForTag(fe.Tag()),
+							Message: utils.MessageForTag(fe.Tag(), fe.Param()),
 						}
 					}
 					c.JSON(400, gin.H{"errors": out})

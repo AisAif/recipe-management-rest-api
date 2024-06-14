@@ -19,24 +19,20 @@ func InitValidator() *validator.Validate {
 		var user models.User
 		models.DB.First(&user, "username = ?", username)
 
-		if user.Username != "" {
-			return false
-		}
-
-		return true
+		return user.Username == ""
 	})
 
 	return validate
 }
 
-func MessageForTag(tag string) string {
+func MessageForTag(tag string, param string) string {
 	switch tag {
 	case "required":
 		return "This field is required"
 	case "min":
-		return "This field must be at least 3 characters"
+		return "This field must be at least " + param + " characters"
 	case "max":
-		return "This field must not exceed 255 characters"
+		return "This field must not exceed " + param + " characters"
 	case "username_exists":
 		return "Username already exists"
 	default:
