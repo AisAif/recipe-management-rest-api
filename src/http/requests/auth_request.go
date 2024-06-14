@@ -5,3 +5,8 @@ type RegisterRequest struct {
 	Name     string `validate:"required,min=3,max=255" json:"name"`
 	Password string `validate:"required,min=8,max=255" json:"password"`
 }
+
+type LoginRequest struct {
+	Username string `validate:"required,min=3,max=255" json:"username"`
+	Password string `validate:"required,min=8,max=255" json:"password"`
+}
