@@ -2,12 +2,17 @@ package middleware
 
 import (
 	"errors"
+	"net/http"
+	"reflect"
 
+	"github.com/AisAif/recipe-management-rest-api/src/http/resources"
 	"github.com/AisAif/recipe-management-rest-api/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/iancoleman/strcase"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func GlobalErrorHandler() gin.HandlerFunc {
@@ -16,8 +21,7 @@ func GlobalErrorHandler() gin.HandlerFunc {
 
 		err := c.Errors.Last()
 		if err != nil {
-			switch err.Err.(type) {
-			case validator.ValidationErrors:
+			if reflect.TypeOf(err.Err) == reflect.TypeOf(validator.ValidationErrors{}) {
 				var ve validator.ValidationErrors
 				if errors.As(err, &ve) {
 					out := make([]utils.ValidationError, len(ve))
@@ -27,19 +31,32 @@ func GlobalErrorHandler() gin.HandlerFunc {
 							Message: utils.MessageForTag(fe.Tag(), fe.Param()),
 						}
 					}
-					c.JSON(400, gin.H{"errors": out})
+					c.JSON(http.StatusBadRequest, resources.Resource[any]{
+						Message: "Bad Request",
+						Errors:  out,
+					})
 				}
-
-				return
-			default:
+			} else if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.JSON(http.StatusNotFound, resources.Resource[any]{
+					Message: "Bad Request",
+					Errors:  "Data is not found",
+				})
+			} else if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+				c.JSON(http.StatusBadRequest, resources.Resource[any]{
+					Message: "Bad Request",
+					Errors: map[string]string{
+						"username": "Invalid username or password",
+					},
+				})
+			} else {
 				if viper.GetString("GIN_MODE") == "debug" {
-					c.JSON(500, gin.H{
-						"message": "Internal server error.",
-						"error":   err,
+					c.JSON(http.StatusInternalServerError, resources.Resource[any]{
+						Message: "Internal server error",
+						Errors:  err.Error(),
 					})
 				} else {
-					c.JSON(500, gin.H{
-						"message": "Internal server error.",
+					c.JSON(http.StatusInternalServerError, resources.Resource[any]{
+						Message: "Internal server error",
 					})
 				}
 			}
