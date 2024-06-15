@@ -100,7 +100,7 @@ var _ = Describe("Auth", func() {
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
-			Expect(w.Body.String()).To(ContainSubstring(`exist`))
+			Expect(w.Body.String()).To(ContainSubstring(`EXISTS`))
 		})
 	})
 
@@ -157,7 +157,7 @@ var _ = Describe("Auth", func() {
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusNotFound))
-			Expect(w.Body.String()).To(ContainSubstring(`not found`))
+			Expect(w.Body.String()).To(ContainSubstring(`NOT_FOUND`))
 		})
 
 		It("should return 400: password is wrong", func() {
@@ -173,7 +173,7 @@ var _ = Describe("Auth", func() {
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
-			Expect(w.Body.String()).To(ContainSubstring(`Invalid username`))
+			Expect(w.Body.String()).To(ContainSubstring(`INVALID_CREDENTIALS`))
 		})
 	})
 })

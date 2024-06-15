@@ -39,13 +39,13 @@ func GlobalErrorHandler() gin.HandlerFunc {
 			} else if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, resources.Resource[any]{
 					Message: "Bad Request",
-					Errors:  "Data is not found",
+					Errors:  "NOT_FOUND",
 				})
 			} else if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 				c.JSON(http.StatusBadRequest, resources.Resource[any]{
 					Message: "Bad Request",
 					Errors: map[string]string{
-						"username": "Invalid username or password",
+						"username": "INVALID_CREDENTIALS",
 					},
 				})
 			} else {

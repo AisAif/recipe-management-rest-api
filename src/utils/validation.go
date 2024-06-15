@@ -28,14 +28,14 @@ func InitValidator() *validator.Validate {
 func MessageForTag(tag string, param string) string {
 	switch tag {
 	case "required":
-		return "This field is required"
+		return "REQUIRED"
 	case "min":
-		return "This field must be at least " + param + " characters"
+		return "MIN:" + param
 	case "max":
-		return "This field must not exceed " + param + " characters"
+		return "MAX:" + param
 	case "username_exists":
-		return "Username already exists"
+		return "USERNAME_EXISTS"
 	default:
-		return ""
+		return "UNKNOWN"
 	}
 }
