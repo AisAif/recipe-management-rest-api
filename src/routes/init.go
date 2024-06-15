@@ -18,9 +18,10 @@ func InitRouter() *gin.Engine {
 	models.InitDB()
 	r := gin.Default()
 
-	r.Use(middleware.GlobalErrorHandler())
+	r.Use(middleware.GlobalErrorMiddleware())
 
 	Auth(r.Group("/auth/"))
+	User(r.Group("/users/"))
 
 	return r
 }

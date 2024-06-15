@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func GlobalErrorHandler() gin.HandlerFunc {
+func GlobalErrorMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 
