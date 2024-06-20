@@ -14,14 +14,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var routerForAuth *gin.Engine = routes.InitRouter()
+
 var _ = Describe("Auth", func() {
-	var router *gin.Engine
 	var w *httptest.ResponseRecorder
 	var req *http.Request
 
 	BeforeEach(func() {
-		router = routes.InitRouter()
-
 		w = httptest.NewRecorder()
 	})
 
@@ -41,7 +40,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/register", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusCreated))
@@ -58,7 +57,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/register", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
@@ -77,7 +76,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/register", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
@@ -96,7 +95,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/register", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
@@ -120,7 +119,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusOK))
@@ -136,7 +135,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
@@ -153,7 +152,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusNotFound))
@@ -169,7 +168,7 @@ var _ = Describe("Auth", func() {
 
 			req, _ = http.NewRequest("POST", "/auth/login", strings.NewReader(string(userJson)))
 			req.Header.Set("Content-Type", "application/json")
-			router.ServeHTTP(w, req)
+			routerForAuth.ServeHTTP(w, req)
 
 			log.Info().Msg(w.Body.String())
 			Expect(w.Code).To(Equal(http.StatusBadRequest))
