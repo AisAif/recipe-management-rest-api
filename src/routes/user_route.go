@@ -15,4 +15,5 @@ func User(r *gin.RouterGroup) {
 
 	authRouter := r.Use(middleware.AuthMiddleware())
 	authRouter.GET("/current", userController.GetCurrent)
+	authRouter.PATCH("/current", userController.UpdateCurrent)
 }
