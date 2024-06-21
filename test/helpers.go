@@ -25,7 +25,8 @@ func CreateUser() {
 	})
 }
 
-func GetUserToken(router *gin.Engine, w *httptest.ResponseRecorder) string {
+func GetUserToken(router *gin.Engine) string {
+	w := httptest.NewRecorder()
 	exampleUser := models.User{
 		Username: "test",
 		Password: "testtest",
