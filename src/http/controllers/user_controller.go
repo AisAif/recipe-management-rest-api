@@ -24,9 +24,10 @@ func NewUserController(userService services.UserService) UserController {
 }
 
 func (c UserControllerImpl) GetCurrent(ctx *gin.Context) {
-	username := ctx.GetString("username")
+	userValue, _ := ctx.Get("user")
+	user, _ := userValue.(resources.UserResource)
 
-	user, err := c.UserService.GetCurrent(username)
+	user, err := c.UserService.GetCurrent(user.Username)
 	if err != nil {
 		ctx.Error(err)
 		return
@@ -39,7 +40,6 @@ func (c UserControllerImpl) GetCurrent(ctx *gin.Context) {
 }
 
 func (c UserControllerImpl) UpdateCurrent(ctx *gin.Context) {
-	username := ctx.GetString("username")
 	var request requests.UpdateUserRequest
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
@@ -47,7 +47,10 @@ func (c UserControllerImpl) UpdateCurrent(ctx *gin.Context) {
 		return
 	}
 
-	err = c.UserService.UpdateCurrent(username, &request)
+	userValue, _ := ctx.Get("user")
+	user, _ := userValue.(resources.UserResource)
+
+	err = c.UserService.UpdateCurrent(user.Username, &request)
 	if err != nil {
 		ctx.Error(err)
 		return

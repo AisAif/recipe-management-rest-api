@@ -31,7 +31,7 @@ func NewUserService(db *gorm.DB, validate *validator.Validate) UserService {
 func (s *UserServiceImpl) GetCurrent(username string) (resources.UserResource, error) {
 
 	var user models.User
-	err := s.DB.Find(&user, username).Error
+	err := s.DB.Find(&user, "username = ?", username).Error
 	if err != nil {
 		return resources.UserResource{}, err
 	}
@@ -48,7 +48,7 @@ func (s *UserServiceImpl) UpdateCurrent(username string, request *requests.Updat
 	}
 
 	var user *models.User
-	err := s.DB.Find(&user, username).Error
+	err := s.DB.Find(&user, "username = ?", username).Error
 	if err != nil {
 		return err
 	}
