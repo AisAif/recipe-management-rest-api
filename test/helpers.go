@@ -13,6 +13,7 @@ import (
 )
 
 func RemoveAllData() {
+	models.DB.Exec("DELETE FROM recipes")
 	models.DB.Exec("DELETE FROM users")
 }
 
