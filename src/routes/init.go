@@ -4,6 +4,7 @@ import (
 	"github.com/AisAif/recipe-management-rest-api/src/config"
 	"github.com/AisAif/recipe-management-rest-api/src/middleware"
 	"github.com/AisAif/recipe-management-rest-api/src/models"
+	"github.com/AisAif/recipe-management-rest-api/src/storage"
 	"github.com/AisAif/recipe-management-rest-api/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -16,12 +17,14 @@ func InitRouter() *gin.Engine {
 
 	utils.InitLog()
 	models.InitDB()
+	storage.InitStorage()
 	r := gin.Default()
 
 	r.Use(middleware.GlobalErrorMiddleware())
 
-	Auth(r.Group("/auth/"))
-	User(r.Group("/users/"))
+	Auth(r.Group("/auth"))
+	User(r.Group("/users"))
+	Recipe(r.Group("/recipes"))
 
 	return r
 }
