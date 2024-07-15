@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/AisAif/recipe-management-rest-api/src/config"
-	"github.com/AisAif/recipe-management-rest-api/src/middleware"
+	"github.com/AisAif/recipe-management-rest-api/src/http/middleware"
 	"github.com/AisAif/recipe-management-rest-api/src/models"
 	"github.com/AisAif/recipe-management-rest-api/src/storage"
 	"github.com/AisAif/recipe-management-rest-api/src/utils"
