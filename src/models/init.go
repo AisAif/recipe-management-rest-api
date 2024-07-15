@@ -21,7 +21,7 @@ func InitDB() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	database.AutoMigrate(&User{})
+	database.AutoMigrate(&User{}, &Recipe{})
 
 	DB = database
 }
