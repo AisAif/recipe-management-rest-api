@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/spf13/viper"
 )
@@ -13,7 +14,7 @@ import (
 type storageInterface interface {
 	Store(path string, f *multipart.FileHeader) (filePath string, err error)
 	GetURL() (url string, err error)
-	Delete() error
+	Delete(path string) error
 }
 
 func InitStorage() {
@@ -32,9 +33,11 @@ func InitStorage() {
 		}))
 
 		uploader := s3manager.NewUploader(sess)
+		s3Client := s3.New(sess)
 
 		Storage = &s3Storage{
 			uploader: uploader,
+			s3Client: s3Client,
 		}
 	} else {
 		Storage = &localStorage{}

@@ -14,6 +14,6 @@ func (s localStorage) GetURL() (url string, err error) {
 	return "", nil
 }
 
-func (s localStorage) Delete() error {
+func (s localStorage) Delete(path string) error {
 	return nil
 }

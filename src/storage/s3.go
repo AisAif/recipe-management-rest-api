@@ -4,6 +4,7 @@ import (
 	"mime/multipart"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
@@ -11,6 +12,7 @@ import (
 
 type s3Storage struct {
 	uploader *s3manager.Uploader
+	s3Client *s3.S3
 }
 
 func (s s3Storage) Store(path string, f *multipart.FileHeader) (filePath string, err error) {
@@ -40,6 +42,15 @@ func (s s3Storage) GetURL() (url string, err error) {
 	return "", nil
 }
 
-func (s s3Storage) Delete() error {
+func (s s3Storage) Delete(path string) error {
+	_, err := s.s3Client.DeleteObject(&s3.DeleteObjectInput{
+		Bucket: aws.String(viper.GetString("AWS_BUCKET")),
+		Key:    aws.String(path),
+	})
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
