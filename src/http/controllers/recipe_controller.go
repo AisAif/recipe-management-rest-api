@@ -115,6 +115,6 @@ func (c RecipeControllerImpl) Current(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resources.Resource[[]resources.RecipeResource]{
 		Message:  "Successfully fetched",
 		Data:     recipes,
-		PageInfo: pageInfo,
+		PageInfo: &pageInfo,
 	})
 }
