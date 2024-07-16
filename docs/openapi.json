@@ -1,0 +1,409 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Recipe Management API",
+    "description": "Rest API for Recipe Management",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Abdullah Isbarul Fahmi",
+      "email": "iam@ais-aif.my.id",
+      "url": "https://ais-aif.my.id"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://recipe.ais-aif.my.id"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Auth API"
+    },
+    {
+      "name": "User",
+      "description": "User API"
+    },
+    {
+      "name": "Recipe",
+      "description": "Recipe API"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "operationId": "register",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/RegisterRequest"
+        },
+        "responses": {
+          "201": {
+            "description": "registered"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login a user",
+        "operationId": "login",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/LoginRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
+    "/users/current": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get current user",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          }
+        ],
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetUserResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["User"],
+        "summary": "Update current user",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          }
+        ],
+        "operationId": "updateCurrentUser",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UpdateUserRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/recipes": {
+      "post": {
+        "tags": ["Recipe"],
+        "summary": "Create a new recipe",
+        "operationId": "createRecipe",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/CreateRecipeRequest"
+        },
+        "responses": {
+          "201": {
+            "description": "created"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/recipes/{recipe_id}": {
+      "patch": {
+        "tags": ["Recipe"],
+        "summary": "Update a recipe",
+        "operationId": "updateRecipe",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/UpdateRecipeRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "requestBodies": {
+      "RegisterRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateRecipeRequest": {
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string",
+                  "description": "Recipe content in markdown or HTML format"
+                },
+                "image": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "required": ["title", "content", "image"]
+            }
+          }
+        }
+      },
+      "UpdateRecipeRequest": {
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string",
+                  "description": "Recipe content in markdown or HTML format"
+                },
+                "image": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "LoginResponse": {
+        "description": "login response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "{token}"
+                    }
+                  }
+                },
+                "message": {
+                  "example": "Login succesfully"
+                },
+                "errors": {
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetUserResponse": {
+        "description": "get user response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "user"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "user"
+                    }
+                  }
+                },
+                "message": {
+                  "example": "Success"
+                },
+                "errors": {
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "UpdateResponse": {
+        "description": "update response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "example": null
+                },
+                "message": {
+                  "example": "Updated successfully"
+                },
+                "errors": {
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "unauthorized error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "example": null
+                },
+                "message": {
+                  "example": "No Authorization header provided"
+                },
+                "errors": {
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "error validation",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "example": null
+                },
+                "message": {
+                  "example": "Bad Request"
+                },
+                "errors": {
+                  "type": "object",
+                  "example": {
+                    "username": ["REQUIRED"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "Authorization": {
+        "name": "Authorization",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "example": "{token}"
+        }
+      }
+    }
+  }
+}
