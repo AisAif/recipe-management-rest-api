@@ -194,4 +194,37 @@ var _ = Describe("Recipe", func() {
 			Expect(w.Code).To(Equal(http.StatusOK))
 		})
 	})
+
+	Context("Delete Recipe", func() {
+		BeforeEach(func() {
+			RemoveAllData()
+			CreateUser()
+		})
+
+		It("should return 404", func() {
+			// get recipe
+			recipe := GetRecipe(routerForRecipe)
+
+			userToken := GetUserToken(routerForRecipe)
+			req, _ = http.NewRequest("DELETE", "/recipes/"+strconv.FormatUint(recipe.ID+1, 10), nil)
+			req.Header.Set("Authorization", userToken)
+			routerForRecipe.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusNotFound))
+			Expect(w.Body.String()).To(ContainSubstring(`NOT_FOUND`))
+		})
+
+		It("should return 200", func() {
+			// get recipe
+			recipe := GetRecipe(routerForRecipe)
+
+			userToken := GetUserToken(routerForRecipe)
+			req, _ = http.NewRequest("DELETE", "/recipes/"+strconv.FormatUint(recipe.ID, 10), nil)
+			req.Header.Set("Authorization", userToken)
+			routerForRecipe.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(w.Body.String()).To(ContainSubstring(`Successfully deleted`))
+		})
+	})
 })
