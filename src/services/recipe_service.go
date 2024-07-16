@@ -12,6 +12,7 @@ import (
 
 type RecipeService interface {
 	Create(username string, request requests.CreateRecipeRequest) error
+	Update(username string, id string, request requests.UpdateRecipeRequest) error
 }
 
 type RecipeServiceImpl struct {
@@ -51,4 +52,46 @@ func (s *RecipeServiceImpl) Create(username string, request requests.CreateRecip
 	}
 
 	return nil
+}
+
+func (s *RecipeServiceImpl) Update(username string, id string, request requests.UpdateRecipeRequest) error {
+	if err := s.Validate.Struct(request); err != nil {
+		return err
+	}
+
+	var recipe *models.Recipe
+	result := s.DB.Find(&recipe, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	if request.Title != "" {
+		recipe.Title = request.Title
+	}
+
+	if request.Content != "" {
+		recipe.Content = request.Content
+	}
+
+	if request.Image != nil {
+
+		err := storage.Storage.Delete(recipe.ImageURL)
+		if err != nil {
+			return err
+		}
+		imageUrl, err := storage.Storage.Store("recipe/"+username, request.Image)
+		if err != nil {
+			return err
+		}
+
+		recipe.ImageURL = imageUrl
+	}
+
+	recipe.UpdatedAt = time.Now()
+
+	return s.DB.Save(&recipe).Error
 }

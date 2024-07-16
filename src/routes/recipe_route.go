@@ -15,4 +15,5 @@ func Recipe(r *gin.RouterGroup) {
 
 	authRouter := r.Use(middleware.AuthMiddleware())
 	authRouter.POST("", recipeController.Create)
+	authRouter.PATCH("/:recipe_id", recipeController.Update)
 }

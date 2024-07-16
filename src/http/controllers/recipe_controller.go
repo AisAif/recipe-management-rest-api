@@ -12,6 +12,7 @@ import (
 
 type RecipeController interface {
 	Create(c *gin.Context)
+	Update(c *gin.Context)
 }
 type RecipeControllerImpl struct {
 	recipeService services.RecipeService
@@ -45,5 +46,28 @@ func (c RecipeControllerImpl) Create(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, resources.Resource[any]{
 		Message: "Successfully created",
+	})
+}
+
+func (c RecipeControllerImpl) Update(ctx *gin.Context) {
+	var request requests.UpdateRecipeRequest
+
+	err := ctx.ShouldBind(&request)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	userValue, _ := ctx.Get("user")
+	user, _ := userValue.(resources.UserResource)
+
+	err = c.recipeService.Update(user.Username, ctx.Param("recipe_id"), request)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resources.Resource[any]{
+		Message: "Successfully updated",
 	})
 }

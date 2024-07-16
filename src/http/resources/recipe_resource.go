@@ -2,14 +2,13 @@ package resources
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type RecipeResource struct {
-	ID        uuid.UUID    `json:"id"`
+	ID        uint64       `json:"id"`
 	Title     string       `json:"title"`
 	Content   string       `json:"content"`
+	ImageURL  string       `json:"image_url"`
 	User      UserResource `json:"user"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
