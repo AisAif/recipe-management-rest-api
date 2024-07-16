@@ -18,4 +18,5 @@ func Recipe(r *gin.RouterGroup) {
 	authRouter.PATCH("/:recipe_id", recipeController.Update)
 	authRouter.PATCH("/:recipe_id/toggle-publish", recipeController.TogglePublish)
 	authRouter.DELETE("/:recipe_id", recipeController.Delete)
+	authRouter.GET("/current", recipeController.Current)
 }

@@ -4,9 +4,12 @@ import (
 	"time"
 
 	"github.com/AisAif/recipe-management-rest-api/src/http/requests"
+	"github.com/AisAif/recipe-management-rest-api/src/http/resources"
 	"github.com/AisAif/recipe-management-rest-api/src/models"
 	"github.com/AisAif/recipe-management-rest-api/src/storage"
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/rosberry/go-pagination"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +18,7 @@ type RecipeService interface {
 	Update(username string, id string, request requests.UpdateRecipeRequest) error
 	Delete(username string, id string) error
 	TogglePublish(username string, id string) error
+	List(ctx *gin.Context, username string) ([]resources.RecipeResource, pagination.PageInfo, error)
 }
 
 type RecipeServiceImpl struct {
@@ -131,4 +135,50 @@ func (s *RecipeServiceImpl) TogglePublish(username string, id string) error {
 	recipe.IsPublic = !recipe.IsPublic
 
 	return s.DB.Save(&recipe).Error
+}
+
+func (s *RecipeServiceImpl) List(ctx *gin.Context, username string) ([]resources.RecipeResource, pagination.PageInfo, error) {
+	paginator, err := pagination.New(pagination.Options{
+		GinContext:    ctx,
+		DB:            s.DB,
+		Model:         &models.User{},
+		Limit:         5,
+		DefaultCursor: nil,
+	})
+	if err != nil {
+		return nil, pagination.PageInfo{}, err
+	}
+
+	var result *gorm.DB
+
+	if username == "" {
+		result = s.DB.Preload("User").Find(&[]models.Recipe{})
+	} else {
+		result = s.DB.Preload("User").Where("username = ?", username).Find(&[]models.Recipe{})
+	}
+
+	var recipes []models.Recipe
+	err = paginator.Find(result, &recipes)
+	if err != nil {
+		return nil, pagination.PageInfo{}, err
+	}
+
+	var recipeResources []resources.RecipeResource
+	for _, recipe := range recipes {
+		recipeResources = append(recipeResources, resources.RecipeResource{
+			ID:        recipe.ID,
+			Title:     recipe.Title,
+			Content:   recipe.Content,
+			ImageURL:  recipe.ImageURL,
+			IsPublic:  recipe.IsPublic,
+			CreatedAt: recipe.CreatedAt,
+			UpdatedAt: recipe.UpdatedAt,
+			User: resources.UserResource{
+				Name:     recipe.User.Name,
+				Username: recipe.User.Username,
+			},
+		})
+	}
+
+	return recipeResources, *paginator.PageInfo, nil
 }
