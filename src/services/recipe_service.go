@@ -14,6 +14,7 @@ type RecipeService interface {
 	Create(username string, request requests.CreateRecipeRequest) error
 	Update(username string, id string, request requests.UpdateRecipeRequest) error
 	Delete(username string, id string) error
+	TogglePublish(username string, id string) error
 }
 
 type RecipeServiceImpl struct {
@@ -114,4 +115,20 @@ func (s *RecipeServiceImpl) Delete(username string, id string) error {
 	}
 
 	return s.DB.Delete(&recipe).Error
+}
+
+func (s *RecipeServiceImpl) TogglePublish(username string, id string) error {
+	var recipe *models.Recipe
+	result := s.DB.Find(&recipe, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	recipe.IsPublic = !recipe.IsPublic
+
+	return s.DB.Save(&recipe).Error
 }

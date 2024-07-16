@@ -13,6 +13,7 @@ type RecipeController interface {
 	Create(c *gin.Context)
 	Update(c *gin.Context)
 	Delete(c *gin.Context)
+	TogglePublish(c *gin.Context)
 }
 type RecipeControllerImpl struct {
 	recipeService services.RecipeService
@@ -82,5 +83,20 @@ func (c RecipeControllerImpl) Delete(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, resources.Resource[any]{
 		Message: "Successfully deleted",
+	})
+}
+
+func (c RecipeControllerImpl) TogglePublish(ctx *gin.Context) {
+	userValue, _ := ctx.Get("user")
+	user, _ := userValue.(resources.UserResource)
+
+	err := c.recipeService.TogglePublish(user.Username, ctx.Param("recipe_id"))
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resources.Resource[any]{
+		Message: "Successfully toggled",
 	})
 }
