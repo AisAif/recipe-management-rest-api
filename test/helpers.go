@@ -1,9 +1,14 @@
 package test
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/textproto"
+	"os"
 	"strings"
 
 	"github.com/AisAif/recipe-management-rest-api/src/http/resources"
@@ -42,4 +47,37 @@ func GetUserToken(router *gin.Engine) string {
 	json.Unmarshal(w.Body.Bytes(), &body)
 
 	return body.Data.(map[string]interface{})["token"].(string)
+}
+
+func GetRecipe(routerForRecipe *gin.Engine) models.Recipe {
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	_ = writer.WriteField("title", "test")
+	_ = writer.WriteField("content", "test")
+
+	file, _ := os.Open("./assets/test_asset.jpg")
+	defer file.Close()
+
+	partHeaders := textproto.MIMEHeader{}
+	partHeaders.Set("Content-Disposition", `form-data; name="image"; filename="test_asset.jpg"`)
+	partHeaders.Set("Content-Type", "image/jpeg")
+	part, _ := writer.CreatePart(partHeaders)
+
+	_, _ = io.Copy(part, file)
+
+	_ = writer.Close()
+
+	userToken := GetUserToken(routerForRecipe)
+	req, _ := http.NewRequest("POST", "/recipes", body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", userToken)
+
+	w := httptest.NewRecorder()
+	routerForRecipe.ServeHTTP(w, req)
+
+	var recipe = models.Recipe{}
+	models.DB.Last(&recipe)
+
+	return recipe
 }
