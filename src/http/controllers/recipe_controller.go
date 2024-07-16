@@ -7,12 +7,12 @@ import (
 	"github.com/AisAif/recipe-management-rest-api/src/http/resources"
 	"github.com/AisAif/recipe-management-rest-api/src/services"
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog/log"
 )
 
 type RecipeController interface {
 	Create(c *gin.Context)
 	Update(c *gin.Context)
+	Delete(c *gin.Context)
 }
 type RecipeControllerImpl struct {
 	recipeService services.RecipeService
@@ -32,8 +32,6 @@ func (c RecipeControllerImpl) Create(ctx *gin.Context) {
 		ctx.Error(err)
 		return
 	}
-
-	log.Debug().Msg("File name: " + request.Image.Header.Get("Content-Type"))
 
 	userValue, _ := ctx.Get("user")
 	user, _ := userValue.(resources.UserResource)
@@ -69,5 +67,20 @@ func (c RecipeControllerImpl) Update(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, resources.Resource[any]{
 		Message: "Successfully updated",
+	})
+}
+
+func (c RecipeControllerImpl) Delete(ctx *gin.Context) {
+	userValue, _ := ctx.Get("user")
+	user, _ := userValue.(resources.UserResource)
+
+	err := c.recipeService.Delete(user.Username, ctx.Param("recipe_id"))
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resources.Resource[any]{
+		Message: "Successfully deleted",
 	})
 }

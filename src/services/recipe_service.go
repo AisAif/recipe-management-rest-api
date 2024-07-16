@@ -13,6 +13,7 @@ import (
 type RecipeService interface {
 	Create(username string, request requests.CreateRecipeRequest) error
 	Update(username string, id string, request requests.UpdateRecipeRequest) error
+	Delete(username string, id string) error
 }
 
 type RecipeServiceImpl struct {
@@ -94,4 +95,23 @@ func (s *RecipeServiceImpl) Update(username string, id string, request requests.
 	recipe.UpdatedAt = time.Now()
 
 	return s.DB.Save(&recipe).Error
+}
+
+func (s *RecipeServiceImpl) Delete(username string, id string) error {
+	var recipe *models.Recipe
+	result := s.DB.Find(&recipe, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	err := storage.Storage.Delete(recipe.ImageURL)
+	if err != nil {
+		return err
+	}
+
+	return s.DB.Delete(&recipe).Error
 }
