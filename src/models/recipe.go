@@ -9,6 +9,7 @@ type Recipe struct {
 	Title     string `gorm:"size:255"`
 	ImageURL  string `gorm:"size:255"`
 	Content   string `gorm:"type:text"`
+	IsPublic  bool   `gorm:"default:false"`
 	Username  string `gorm:"size:255"`
 	CreatedAt time.Time
 	UpdatedAt time.Time

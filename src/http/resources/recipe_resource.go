@@ -10,6 +10,7 @@ type RecipeResource struct {
 	Content   string       `json:"content"`
 	ImageURL  string       `json:"image_url"`
 	User      UserResource `json:"user"`
+	IsPublic  bool         `json:"is_public"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 }
