@@ -10,7 +10,7 @@ func (s localStorage) Store(path string, f *multipart.FileHeader) (filePath stri
 	return "", nil
 }
 
-func (s localStorage) GetURL() (url string, err error) {
+func (s localStorage) GetURL(path string) (url string, err error) {
 	return "", nil
 }
 

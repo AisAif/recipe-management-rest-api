@@ -2,6 +2,8 @@ package storage
 
 import (
 	"mime/multipart"
+	"strings"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -38,8 +40,17 @@ func (s s3Storage) Store(path string, f *multipart.FileHeader) (filePath string,
 	return filePath, nil
 }
 
-func (s s3Storage) GetURL() (url string, err error) {
-	return "", nil
+func (s s3Storage) GetURL(path string) (url string, err error) {
+	if viper.GetString("AWS_URL") != "" {
+		return viper.GetString("AWS_URL") + "/" + strings.ReplaceAll(path, " ", "%20"), nil
+	} else {
+		req, _ := s.s3Client.GetObjectAclRequest(&s3.GetObjectAclInput{
+			Bucket: aws.String(viper.GetString("AWS_BUCKET")),
+			Key:    aws.String(path),
+		})
+
+		return req.Presign(15 * time.Minute)
+	}
 }
 
 func (s s3Storage) Delete(path string) error {

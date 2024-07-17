@@ -13,7 +13,7 @@ import (
 
 type storageInterface interface {
 	Store(path string, f *multipart.FileHeader) (filePath string, err error)
-	GetURL() (url string, err error)
+	GetURL(path string) (url string, err error)
 	Delete(path string) error
 }
 
@@ -28,7 +28,7 @@ func InitStorage() {
 		sess := session.Must(session.NewSession(&aws.Config{
 			Endpoint:         aws.String(viper.GetString("AWS_ENDPOINT")),
 			Region:           aws.String(viper.GetString("AWS_DEFAULT_REGION")),
-			S3ForcePathStyle: aws.Bool(true),
+			S3ForcePathStyle: aws.Bool(viper.GetBool("AWS_USE_PATH_STYLE_ENDPOINT")),
 			Credentials:      creds,
 		}))
 
