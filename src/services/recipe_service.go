@@ -165,11 +165,17 @@ func (s *RecipeServiceImpl) List(ctx *gin.Context, username string) ([]resources
 
 	var recipeResources []resources.RecipeResource
 	for _, recipe := range recipes {
+
+		imageUrl, err := storage.Storage.GetURL(recipe.ImageURL)
+		if err != nil {
+			return nil, pagination.PageInfo{}, err
+		}
+
 		recipeResources = append(recipeResources, resources.RecipeResource{
 			ID:        recipe.ID,
 			Title:     recipe.Title,
 			Content:   recipe.Content,
-			ImageURL:  recipe.ImageURL,
+			ImageURL:  imageUrl,
 			IsPublic:  recipe.IsPublic,
 			CreatedAt: recipe.CreatedAt,
 			UpdatedAt: recipe.UpdatedAt,
