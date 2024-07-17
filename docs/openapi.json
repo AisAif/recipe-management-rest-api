@@ -134,9 +134,77 @@
             "$ref": "#/components/responses/UnauthorizedError"
           }
         }
+      },
+      "get": {
+        "tags": ["Recipe"],
+        "summary": "Get all publish recipes",
+        "operationId": "getAllRecipes",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Sorting"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetRecipesResponse"
+          }
+        }
+      }
+    },
+    "/recipes/current": {
+      "get": {
+        "tags": ["Recipe"],
+        "summary": "Get current user's recipes",
+        "operationId": "getCurrentUserRecipes",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Sorting"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetRecipesResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
       }
     },
     "/recipes/{recipe_id}": {
+      "get": {
+        "tags": ["Recipe"],
+        "summary": "Get a recipe",
+        "operationId": "getRecipe",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          },
+          {
+            "$ref": "#/components/parameters/RecipeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/GetRecipeResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      },
       "patch": {
         "tags": ["Recipe"],
         "summary": "Update a recipe",
@@ -144,6 +212,9 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/Authorization"
+          },
+          {
+            "$ref": "#/components/parameters/RecipeId"
           }
         ],
         "requestBody": {
@@ -158,12 +229,131 @@
           },
           "401": {
             "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Recipe"],
+        "summary": "Delete a recipe",
+        "operationId": "deleteRecipe",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          },
+          {
+            "$ref": "#/components/parameters/RecipeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/recipes/{recipe_id}/toggle-publish": {
+      "patch": {
+        "tags": ["Recipe"],
+        "summary": "Toggle publish for recipe",
+        "operationId": "togglePublishRecipe",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Authorization"
+          },
+          {
+            "$ref": "#/components/parameters/RecipeId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/UpdateResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
           }
         }
       }
     }
   },
   "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "test"
+          },
+          "name": {
+            "type": "string",
+            "example": "test"
+          }
+        }
+      },
+      "Recipe": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "recipe a"
+          },
+          "content": {
+            "type": "string",
+            "example": "{markdown or html}"
+          },
+          "image_url": {
+            "type": "string",
+            "example": "https://example.com/image.png"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "is_public": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageInfo": {
+        "type": "object",
+        "example": {
+          "example": {
+            "next": "eyJmaWVsZHMiOlt7Im5hbWUiOiJpZCIsInZhbHVlIjo4MCwiZGlyZWN0aW9uIjoiYXNjIn1dLCJsaW1pdCI6NSwiYmFja3dhcmQiOmZhbHNlfQ==",
+            "prev": "eyJmaWVsZHMiOlt7Im5hbWUiOiJpZCIsInZhbHVlIjo3NiwiZGlyZWN0aW9uIjoiYXNjIn1dLCJsaW1pdCI6NSwiYmFja3dhcmQiOnRydWV9",
+            "hasNext": true,
+            "hasPrev": false,
+            "totalRows": 8,
+            "rangeTruncated": false
+          }
+        }
+      }
+    },
     "requestBodies": {
       "RegisterRequest": {
         "content": {
@@ -327,6 +517,54 @@
           }
         }
       },
+      "GetRecipeResponse": {
+        "description": "get recipe response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/components/schemas/Recipe"
+                },
+                "message": {
+                  "example": "Success"
+                },
+                "errors": {
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetRecipesResponse": {
+        "description": "get all recipes response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Recipe"
+                  }
+                },
+                "message": {
+                  "example": "Success"
+                },
+                "errors": {
+                  "example": null
+                },
+                "page_info": {
+                  "$ref": "#/components/schemas/PageInfo"
+                }
+              }
+            }
+          }
+        }
+      },
       "UpdateResponse": {
         "description": "update response",
         "content": {
@@ -339,6 +577,27 @@
                 },
                 "message": {
                   "example": "Updated successfully"
+                },
+                "errors": {
+                  "example": null
+                }
+              }
+            }
+          }
+        }
+      },
+      "DeleteResponse": {
+        "description": "delete response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "example": null
+                },
+                "message": {
+                  "example": "Deleted successfully"
                 },
                 "errors": {
                   "example": null
@@ -392,6 +651,27 @@
             }
           }
         }
+      },
+      "NotFoundError": {
+        "description": "not found error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "example": null
+                },
+                "message": {
+                  "example": "Not found"
+                },
+                "errors": {
+                  "example": null
+                }
+              }
+            }
+          }
+        }
       }
     },
     "parameters": {
@@ -402,6 +682,32 @@
         "schema": {
           "type": "string",
           "example": "{token}"
+        }
+      },
+      "RecipeId": {
+        "name": "recipe_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      "Cursor": {
+        "name": "cursor",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "example": "{cursor}"
+        }
+      },
+      "Sorting": {
+        "name": "sorting",
+        "in": "query",
+        "description": "Sorting query parameters is JSON encoded string. For example, [{\"field\": \"Name\",\"direction\": \"asc\"},{\"field\":\"UpdatedAt\",\"direction\":\"desc\"}]",
+        "schema": {
+          "type": "string",
+          "example": "asc%5B%7B%22field%22:%22id%22,%22direction%22:%22desc%22%7D%5Dz"
         }
       }
     }
