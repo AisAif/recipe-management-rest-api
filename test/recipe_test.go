@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/AisAif/recipe-management-rest-api/src/models"
 	"github.com/AisAif/recipe-management-rest-api/src/routes"
 	"github.com/gin-gonic/gin"
 	. "github.com/onsi/ginkgo/v2"
@@ -248,6 +249,31 @@ var _ = Describe("Recipe", func() {
 			Expect(w.Code).To(Equal(http.StatusOK))
 			Expect(w.Body.String()).To(ContainSubstring(`Successfully fetched`))
 			Expect(w.Body.String()).To(ContainSubstring(`test`))
+		})
+	})
+
+	Context("Get All Published Recipes", func() {
+		BeforeEach(func() {
+			RemoveAllData()
+			CreateUser()
+		})
+
+		It("should return 200", func() {
+			// make recipes
+			recipe := GetRecipe(routerForRecipe)
+			recipe.IsPublic = true
+
+			models.DB.Save(&recipe)
+
+			userToken := GetUserToken(routerForRecipe)
+			req, _ = http.NewRequest("GET", "/recipes", nil)
+			req.Header.Set("Authorization", userToken)
+			routerForRecipe.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(w.Body.String()).To(ContainSubstring(`Successfully fetched`))
+			Expect(w.Body.String()).To(ContainSubstring(`test`))
+			Expect(w.Body.String()).To(ContainSubstring(`"is_public":true`))
 		})
 	})
 })
