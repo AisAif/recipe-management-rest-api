@@ -227,4 +227,27 @@ var _ = Describe("Recipe", func() {
 			Expect(w.Body.String()).To(ContainSubstring(`Successfully deleted`))
 		})
 	})
+
+	Context("Get Current User's Recipes", func() {
+		BeforeEach(func() {
+			RemoveAllData()
+			CreateUser()
+		})
+
+		It("should return 200", func() {
+			// make recipes
+			GetRecipe(routerForRecipe)
+			GetRecipe(routerForRecipe)
+			GetRecipe(routerForRecipe)
+
+			userToken := GetUserToken(routerForRecipe)
+			req, _ = http.NewRequest("GET", "/recipes/current", nil)
+			req.Header.Set("Authorization", userToken)
+			routerForRecipe.ServeHTTP(w, req)
+
+			Expect(w.Code).To(Equal(http.StatusOK))
+			Expect(w.Body.String()).To(ContainSubstring(`Successfully fetched`))
+			Expect(w.Body.String()).To(ContainSubstring(`test`))
+		})
+	})
 })
