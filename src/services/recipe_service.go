@@ -18,7 +18,7 @@ type RecipeService interface {
 	Update(username string, id string, request requests.UpdateRecipeRequest) error
 	Delete(username string, id string) error
 	TogglePublish(username string, id string) error
-	List(ctx *gin.Context, username string) ([]resources.RecipeResource, pagination.PageInfo, error)
+	List(ctx *gin.Context, username string, isPublish bool) ([]resources.RecipeResource, pagination.PageInfo, error)
 }
 
 type RecipeServiceImpl struct {
@@ -137,11 +137,11 @@ func (s *RecipeServiceImpl) TogglePublish(username string, id string) error {
 	return s.DB.Save(&recipe).Error
 }
 
-func (s *RecipeServiceImpl) List(ctx *gin.Context, username string) ([]resources.RecipeResource, pagination.PageInfo, error) {
+func (s *RecipeServiceImpl) List(ctx *gin.Context, username string, isPublish bool) ([]resources.RecipeResource, pagination.PageInfo, error) {
 	paginator, err := pagination.New(pagination.Options{
 		GinContext:    ctx,
 		DB:            s.DB,
-		Model:         &models.User{},
+		Model:         &models.Recipe{},
 		Limit:         5,
 		DefaultCursor: nil,
 	})
@@ -157,10 +157,18 @@ func (s *RecipeServiceImpl) List(ctx *gin.Context, username string) ([]resources
 		result = s.DB.Preload("User").Where("username = ?", username).Find(&[]models.Recipe{})
 	}
 
+	if isPublish {
+		result = result.Where("is_public = ?", true)
+	}
+
 	var recipes []models.Recipe
 	err = paginator.Find(result, &recipes)
 	if err != nil {
 		return nil, pagination.PageInfo{}, err
+	}
+
+	if len(recipes) == 0 {
+		return []resources.RecipeResource{}, pagination.PageInfo{}, nil
 	}
 
 	var recipeResources []resources.RecipeResource

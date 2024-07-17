@@ -15,6 +15,7 @@ type RecipeController interface {
 	Delete(c *gin.Context)
 	TogglePublish(c *gin.Context)
 	Current(c *gin.Context)
+	PublishedList(c *gin.Context)
 }
 type RecipeControllerImpl struct {
 	recipeService services.RecipeService
@@ -106,7 +107,21 @@ func (c RecipeControllerImpl) Current(ctx *gin.Context) {
 	userValue, _ := ctx.Get("user")
 	user, _ := userValue.(resources.UserResource)
 
-	recipes, pageInfo, err := c.recipeService.List(ctx, user.Username)
+	recipes, pageInfo, err := c.recipeService.List(ctx, user.Username, false)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, resources.Resource[[]resources.RecipeResource]{
+		Message:  "Successfully fetched",
+		Data:     recipes,
+		PageInfo: &pageInfo,
+	})
+}
+
+func (c RecipeControllerImpl) PublishedList(ctx *gin.Context) {
+	recipes, pageInfo, err := c.recipeService.List(ctx, "", true)
 	if err != nil {
 		ctx.Error(err)
 		return

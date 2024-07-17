@@ -13,6 +13,8 @@ func Recipe(r *gin.RouterGroup) {
 	recipeService := services.NewRecipeService(models.DB, utils.InitValidator())
 	recipeController := controllers.NewRecipeController(recipeService)
 
+	r.GET("", recipeController.PublishedList)
+
 	authRouter := r.Use(middleware.AuthMiddleware())
 	authRouter.POST("", recipeController.Create)
 	authRouter.PATCH("/:recipe_id", recipeController.Update)
