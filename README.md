@@ -33,3 +33,5 @@ docker build . -t rm-app
 docker run -dit --name rm-server -p {host_port}:{container_port} rm-app
 ```
 Make sure {container_port} is the same as the environment port.
+## API Documentation
+[Click Here](https://aisaif.github.io/recipe-management-rest-api/)
