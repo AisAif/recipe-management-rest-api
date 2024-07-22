@@ -642,10 +642,13 @@
                   "example": "Bad Request"
                 },
                 "errors": {
-                  "type": "object",
-                  "example": {
-                    "username": ["REQUIRED"]
-                  }
+                  "type": "array",
+                  "example": [
+                    {
+                      "field": "username",
+                      "message": "REQUIRED"
+                    }
+                  ]
                 }
               }
             }
